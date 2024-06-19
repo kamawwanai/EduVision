@@ -66,7 +66,8 @@ class FaceRecognizer {
 public:
     FaceRecognizer(UserRepository& userRepository);
     void trainModel();
-    void recognizeFaces(cv::CascadeClassifier& face_cascade, std::vector<matrix<float, 0, 1>>& face_descriptors, std::vector<int>& labels, std::vector<std::string>& names);
+    void addUserToModel(int userId);
+    void recognizeFaces(cv::CascadeClassifier& face_cascade, std::vector<matrix<float, 0, 1>>& face_descriptors, std::vector<int>& labels, std::atomic<bool>& stop_flag);
 
     static dlib::frontal_face_detector detector;
     std::mutex frame_mutex;
@@ -76,6 +77,8 @@ public:
     std::condition_variable frame_cond;
     void markAttendance(int userId);
 
+    std::vector<std::string> updated_users;
+
 private:
     dlib::shape_predictor sp;
     anet_type net;
@@ -83,15 +86,15 @@ private:
 };
 
 
-class CameraManager {
-public:
-    CameraManager(FaceRecognizer& recognizer, cv::CascadeClassifier& face_cascade, std::vector<matrix<float, 0, 1>>& face_descriptors, std::vector<int>& labels, std::vector<std::string>& names);
-    void start();
-
-private:
-    FaceRecognizer& recognizer;
-    cv::CascadeClassifier& face_cascade;
-    std::vector<matrix<float, 0, 1>>& face_descriptors;
-    std::vector<int>& labels;
-    std::vector<std::string>& names;
-};
+//class CameraManager {
+//public:
+//    CameraManager(FaceRecognizer& recognizer, cv::CascadeClassifier& face_cascade, std::vector<matrix<float, 0, 1>>& face_descriptors, std::vector<int>& labels, std::vector<std::string>& names);
+//    void start();
+//
+//private:
+//    FaceRecognizer& recognizer;
+//    cv::CascadeClassifier& face_cascade;
+//    std::vector<matrix<float, 0, 1>>& face_descriptors;
+//    std::vector<int>& labels;
+//    std::vector<std::string>& names;
+//};

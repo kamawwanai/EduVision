@@ -13,7 +13,7 @@ class RecognitionTracker {
 public:
     explicit RecognitionTracker(UserRepository& repository);
 
-    void recognize(int user_id);
+    bool recognize(int user_id);
 
 private:
     UserRepository& _repository;
@@ -22,5 +22,5 @@ private:
     static constexpr int RECOGNITION_THRESHOLD = 5;
     static constexpr std::chrono::minutes TIME_THRESHOLD = std::chrono::minutes(30);
 
-    void markAttendedIfThresholdReached(int user_id);
+    bool markAttendedIfThresholdReached(int user_id);
 };
