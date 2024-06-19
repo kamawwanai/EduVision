@@ -142,6 +142,35 @@ auto UserRepository::getAll() const -> std::vector<User> {
     return users;
 }
 
+auto UserRepository::getAllByGroup(std::string group) const -> std::vector<User> {
+    using namespace sqlite_orm; // NOLINT
+    std::vector<User> users;
+    for (auto& userPersist : storage.get_all<User::UserPersist>(where(c(&User::UserPersist::_group) == group))) {
+        auto user = User(std::move(userPersist));
+        enrich_attendance(user.getId(), user);
+        users.emplace_back(std::move(user));
+    }
+    return users;
+}
+
+auto UserRepository::findUserByFullName(std::string name, std::string surname) const -> std::optional<User> {
+    using namespace sqlite_orm; // NOLINT
+    try {
+        auto user_persist = storage.get<User::UserPersist>(
+            where(c(&User::UserPersist::_name) == name and c(&User::UserPersist::_surname) == surname));
+        auto user = User{ std::move(user_persist) };
+        enrich_attendance(user.getId(), user);
+        return user;
+    }
+    catch (std::system_error& e) {
+        auto error_code = e.code();
+        if (error_code == sqlite_orm::orm_error_code::not_found) {
+            return std::nullopt;
+        }
+        throw;
+    }
+}
+
 void UserRepository::clearDatabase() {
     storage.remove_all<User::AttendancePersist>();
     storage.remove_all<User::UserPersist>();
@@ -149,6 +178,6 @@ void UserRepository::clearDatabase() {
 
 UserRepository::UserRepository() : _recognitionTracker(*this) { storage.sync_schema(); }
 
-void UserRepository::recognize(int user_id) {
-    _recognitionTracker.recognize(user_id);
+bool UserRepository::recognize(int user_id) {
+    return _recognitionTracker.recognize(user_id);
 }

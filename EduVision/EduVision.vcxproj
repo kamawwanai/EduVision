@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppUI.cpp" />
     <ClCompile Include="EduVision.cpp" />
     <ClCompile Include="FaceRecognition.cpp" />
     <ClCompile Include="FaceRecognition.hpp" />
@@ -142,6 +143,7 @@
     <ClCompile Include="User.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppUI.hpp" />
     <ClInclude Include="RecognitionTracker.hpp" />
     <ClInclude Include="User.hpp" />
   </ItemGroup>

@@ -84,11 +84,15 @@ public:
 
     void clearDatabase();
 
-    void recognize(int user_id);
+    bool recognize(int user_id);
 
     [[nodiscard]] auto findById(int id) const->std::optional<User>;
 
     [[nodiscard]] auto getAll() const->std::vector<User>;
+
+    [[nodiscard]] auto getAllByGroup(std::string group) const->std::vector<User>;
+
+    [[nodiscard]] auto findUserByFullName(std::string name, std::string surname) const->std::optional<User>;
 
 private:
     void enrich_attendance(int id, User& user) const;

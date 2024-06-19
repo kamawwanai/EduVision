@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 
 #include "User.hpp"
+#include "AppUI.hpp"
 
 int main() {
     try {
@@ -26,12 +27,6 @@ int main() {
         // Чтение обученных дескрипторов лиц и меток
         std::vector<matrix<float, 0, 1>> face_descriptors;
         std::vector<int> labels;
-        std::vector<std::string> names{ "angeline_jolie", "brad_pitt", "denzel_washington", "hugh_jackman",
-                                   "jennifer_lawrence", "johnny_depp", "kate_winslet", "leonardo_dicaprio",
-                                   "magan_fox", "natalie_portman", "nicole_kidman", "robert_downey_jr",
-                                   "sandra_bullock", "scarlett_johansson", "tom_cruise", "tom_hanks",
-                                   "will_smith", "ksenia_karimova", "roma_kislitsyn", "lera_krasovskaya",
-                                   "dima_kutuzov" };
 
         try {
             deserialize("models/face_descriptors.dat") >> face_descriptors >> labels;
@@ -42,8 +37,8 @@ int main() {
         }
 
         // Инициализация CameraManager и запуск распознавания лиц
-        CameraManager cameraManager(faceRecognizer, face_cascade, face_descriptors, labels, names);
-        cameraManager.start();
+        AppUI app(userRepository, faceRecognizer, face_cascade, face_descriptors, labels);
+        app.start();
 
         auto allUsers = userRepository.getAll();
         for (const auto& user : allUsers) {
