@@ -144,6 +144,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppUI.hpp" />
+    <ClInclude Include="dlibrecognitiontest.hpp" />
+    <ClInclude Include="haarcascade_lbph_test.hpp" />
     <ClInclude Include="RecognitionTracker.hpp" />
     <ClInclude Include="User.hpp" />
   </ItemGroup>

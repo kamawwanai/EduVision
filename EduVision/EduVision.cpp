@@ -11,6 +11,21 @@
 #include "AppUI.hpp"
 
 int main() {
+    //UserRepository userRepository;
+
+    //// Инициализация FaceRecognizer
+    //FaceRecognizer faceRecognizer(userRepository);
+
+    //// Загрузка модели каскадного классификатора для обнаружения лиц
+    //cv::CascadeClassifier face_cascade;
+    //if (!face_cascade.load("models/haarcascade_frontalface_default.xml")) {
+    //    std::cerr << "Error loading haarcascade_frontalface_default.xml" << std::endl;
+    //    return -1;
+    //}
+
+    //faceRecognizer.trainModel();
+
+    
     try {
         UserRepository userRepository;
 

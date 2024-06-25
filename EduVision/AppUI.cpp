@@ -81,7 +81,7 @@ void AppUI::start() {
     bool user_created = false;
     int new_user_id = -1;
 
-    while (!glfwWindowShouldClose(window) && !stop_flag) {
+    while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
         {
@@ -198,7 +198,6 @@ void AppUI::start() {
                         ImGui::PopStyleColor();
                     }
                     else {
-                        // Collect unique dates
                         std::map<std::time_t, int> date_map;
                         for (const auto& user : group_users) {
                             for (const auto& attendance : user.getAttendance()) {
@@ -211,13 +210,11 @@ void AppUI::start() {
                             }
                         }
 
-                        // Convert map to sorted vector of dates
                         std::vector<std::time_t> sorted_dates;
                         for (const auto& entry : date_map) {
                             sorted_dates.push_back(entry.first);
                         }
 
-                        // Display the table
                         if (ImGui::BeginTable("GroupAttendanceTable", 1 + sorted_dates.size(), ImGuiTableFlags_ScrollY)) {
                             ImGui::TableSetupColumn("Name");
 
@@ -265,7 +262,7 @@ void AppUI::start() {
 
             ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
-            // Group attendance input field and button
+            // Student attendance input field and button
             ImGui::Text("Student attendance");
             ImGui::SameLine();
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 4));
@@ -281,7 +278,14 @@ void AppUI::start() {
                     name = full_name.substr(0, pos);
                     surname = full_name.substr(pos + 1);
                 }
+                else {
+                    student_attendance_error = true;
+                    show_student_attendance_popup = true;
+                    ImGui::OpenPopup("Student Attendance");
+                    return;
+                }
                 selected_student = dataBase.findUserByFullName(name, surname);
+                std::cout << (*selected_student).getId() << std::endl;
                 if (!selected_student) {
                     student_attendance_error = true;
                 }
@@ -291,7 +295,6 @@ void AppUI::start() {
                 show_student_attendance_popup = true;
                 ImGui::OpenPopup("Student Attendance");
             }
-            ImGui::PopStyleVar();
 
             if (show_student_attendance_popup) {
                 ImGui::SetNextWindowSize(ImVec2(800, 600));
@@ -301,10 +304,10 @@ void AppUI::start() {
                         ImGui::Text("Wrong user name");
                         ImGui::PopStyleColor();
                     }
-                    else {
+                    else if (selected_student) {
                         const User& user = *selected_student;
 
-                        // Collect unique dates
+                        // Собираем уникальные даты посещений
                         std::map<std::time_t, int> date_map;
                         for (const auto& attendance : user.getAttendance()) {
                             std::tm* tm_ptr = std::localtime(&attendance);
@@ -315,13 +318,13 @@ void AppUI::start() {
                             date_map[date]++;
                         }
 
-                        // Convert map to sorted vector of dates
+                        // Преобразуем map в отсортированный вектор дат
                         std::vector<std::time_t> sorted_dates;
                         for (const auto& entry : date_map) {
                             sorted_dates.push_back(entry.first);
                         }
 
-                        // Display the table
+                        // Отображаем таблицу
                         if (ImGui::BeginTable("StudentAttendanceTable", 1 + sorted_dates.size(), ImGuiTableFlags_ScrollY)) {
                             ImGui::TableSetupColumn("Date");
 
@@ -376,30 +379,40 @@ void AppUI::start() {
                 show_add_student_popup = true;
                 ImGui::OpenPopup("Add New Student");
             }
-            ImGui::PopStyleVar();
 
             if (show_add_student_popup) {
-                ImGui::SetNextWindowSize(ImVec2(400, 300));
+                ImGui::SetNextWindowSize(ImVec2(800, 600));
                 if (ImGui::BeginPopupModal("Add New Student", &show_add_student_popup, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
                     ImGui::InputText("Surname", new_surname, IM_ARRAYSIZE(new_surname));
                     ImGui::InputText("Name", new_name, IM_ARRAYSIZE(new_name));
                     ImGui::InputText("Patronymic", new_patronymic, IM_ARRAYSIZE(new_patronymic));
                     ImGui::InputText("Group", new_group, IM_ARRAYSIZE(new_group));
                     if (ImGui::Button("Create User")) {
-                        User new_user(new_name, new_surname, new_patronymic, new_group, "");
-                        new_user_id = new_user.getId();
-                        dataBase.create(new_user);
-                        user_created = true;
+                        try {
+                            User new_user(new_name, new_surname, new_patronymic, new_group, "");
+                            new_user_id = new_user.getId();
+                            dataBase.create(new_user);
+                            user_created = true;
+                        }
+                        catch (const std::exception& e) {
+                            ImGui::Text("Error creating user: %s", e.what());
+                            user_created = false;
+                        }
                     }
                     if (user_created) {
                         ImGui::Text("User created successfully. ID: %d", new_user_id);
                         ImGui::Text("Please upload user's photos. Path:person_data/%d/", new_user_id);
                         if (ImGui::Button("I've uploaded photos")) {
                             if (ImGui::Button("Add user in Recognizer")) {
-                                recognizer.addUserToModel(new_user_id);
-                                show_add_student_popup = false;
+                                try {
+                                    recognizer.addUserToModel(new_user_id);
+                                    show_add_student_popup = false;
+                                }
+                                catch (const std::exception& e) {
+                                    ImGui::Text("Error adding user to recognizer: %s", e.what());
+                                }
                             }
-                        }                        
+                        }
                     }
                     if (ImGui::Button("Close")) {
                         show_add_student_popup = false;

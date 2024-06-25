@@ -5,6 +5,7 @@
 #include "User.hpp"
 #include <sqlite_orm/sqlite_orm.h>
 #include <memory>
+#include <iostream>
 
 User::User(std::string name, std::string surname, std::string patronymic,
     std::string group, std::string photo_path)
@@ -156,18 +157,36 @@ auto UserRepository::getAllByGroup(std::string group) const -> std::vector<User>
 auto UserRepository::findUserByFullName(std::string name, std::string surname) const -> std::optional<User> {
     using namespace sqlite_orm; // NOLINT
     try {
-        auto user_persist = storage.get<User::UserPersist>(
-            where(c(&User::UserPersist::_name) == name and c(&User::UserPersist::_surname) == surname));
-        auto user = User{ std::move(user_persist) };
-        enrich_attendance(user.getId(), user);
-        return user;
-    }
-    catch (std::system_error& e) {
-        auto error_code = e.code();
-        if (error_code == sqlite_orm::orm_error_code::not_found) {
+        if (name.empty() || surname.empty()) {
             return std::nullopt;
         }
-        throw;
+
+        // Формируем запрос используя функции библиотеки sqlite_orm
+        auto user_persist = storage.get_all<User::UserPersist>(
+            where(c(&User::UserPersist::_name) == name and c(&User::UserPersist::_surname) == surname));
+
+        // Проверяем, что нашли хотя бы одного пользователя
+        if (!user_persist.empty()) {
+            auto user = User{ std::move(user_persist.front()) };
+            enrich_attendance(user.getId(), user);
+            return user;
+        }
+        else {
+            return std::nullopt;
+        }
+    }
+    catch (const std::system_error& e) {
+        if (e.code().category() == sqlite_orm::orm_error_category() &&
+            e.code().value() == static_cast<int>(sqlite_orm::orm_error_code::not_found)) {
+            // Не найдено - нормальная ситуация
+            return std::nullopt;
+        }
+        std::cerr << "System error: " << e.what() << "\n"; // Логируем ошибку
+        return std::nullopt;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Exception: " << e.what() << "\n"; // Логируем ошибку
+        return std::nullopt;
     }
 }
 
