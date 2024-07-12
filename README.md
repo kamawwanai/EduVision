@@ -45,3 +45,19 @@ Pre-processing involves normalizing the face image to 150x150 pixels, adjusting 
 </div>
 <br>
 The model was tested on <a href="https://www.kaggle.com/datasets/bhaveshmittal/celebrity-face-recognition-dataset">a dataset from kaggle</a>
+<br><br>
+<h2 align="center">Real-time model work scheme</h2>
+<div align="center">
+  <img src="readme_images/Untitled.jpg" width="400">
+</div>
+
+<h2 align="center">Database</h2>
+<div align="center">
+  ER-diagram scheme
+  <br>
+  <img src="readme_images/kr.png" width="400">
+  <br><br>
+  Database management capabilities
+  <br>
+  <img src="readme_images/Untitled (1).jpg" width="400">
+</div>
