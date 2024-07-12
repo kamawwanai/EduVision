@@ -43,3 +43,5 @@ Pre-processing involves normalizing the face image to 150x150 pixels, adjusting 
 <div align="center">
 <img src="readme_images/accuracy.svg" width="800">
 </div>
+<br>
+The model was tested on <a href="https://www.kaggle.com/datasets/bhaveshmittal/celebrity-face-recognition-dataset">a dataset from kaggle</a>
