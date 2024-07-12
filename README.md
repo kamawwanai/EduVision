@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/zlib-v_1.3.1-green?style=flat-square">
   <img src="https://img.shields.io/badge/sqlite3-v_3.46.0-lightgrey?style=flat-square">
   <img src="https://img.shields.io/badge/sqliteorm-v_1.8.2-lightgrey?style=flat-square">
-  <img src="https://img.shields.io/badge/qt5-v_5.15.14-blue?style=flat-square">
+  <img src="https://img.shields.io/badge/imgui-v_1.90.7-blue?style=flat-square">
 </p>
 
 <p align="center">
